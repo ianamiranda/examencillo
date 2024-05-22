@@ -107,12 +107,34 @@ const popular = async function (req, res) {
   }
 }
 
+
+
+const promoteDemote = async function (req, res) {
+  try {
+    const p = await Product.findOne(req.body, { where: { id: req.params.productId } })
+ 
+    if(p.promote){
+      p.promote=false
+    }else{
+      p.promote=true
+    }
+    await p.save()
+    res.json(p)
+    
+  } catch (err) {
+    res.status(500).send(err)
+  }
+}
+
+
+
 const ProductController = {
   indexRestaurant,
   show,
   create,
   update,
   destroy,
-  popular
+  popular,
+  promoteDemote
 }
 export default ProductController

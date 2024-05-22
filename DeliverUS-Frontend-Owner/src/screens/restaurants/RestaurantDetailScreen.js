@@ -4,7 +4,7 @@ import { StyleSheet, View, FlatList, ImageBackground, Image, Pressable } from 'r
 import { showMessage } from 'react-native-flash-message'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
 import { getDetail } from '../../api/RestaurantEndpoints'
-import { remove } from '../../api/ProductEndpoints'
+import { remove, promote } from '../../api/ProductEndpoints'
 import ImageCard from '../../components/ImageCard'
 import TextRegular from '../../components/TextRegular'
 import TextSemiBold from '../../components/TextSemibold'
@@ -66,6 +66,31 @@ export default function RestaurantDetailScreen ({ navigation, route }) {
           <TextRegular textStyle={styles.availability }>Not available</TextRegular>
         }
          <View style={styles.actionButtonsContainer}>
+
+         {restaurant.descuento !== 0 &&<Pressable
+            onPress={() => { promoteProduct(item) }}
+            style={({ pressed }) => [
+              {
+                backgroundColor: pressed
+                  ? GlobalStyles.brandPrimaryTap
+                  : GlobalStyles.brandPrimary
+              },
+              styles.actionButton
+            ]}>
+          <View style={[{ flex: 1, flexDirection: 'row', justifyContent: 'center' }]}>
+            <MaterialCommunityIcons name='promote' color={'white'} size={20}/>
+            {!item.promote && <> <MaterialCommunityIcons name='promote' color={'white'} size={20}/>
+              <TextRegular textStyle={styles.text}>
+              Promote
+            </TextRegular></>}
+            {item.promote && <><MaterialCommunityIcons name='promote' color={'white'} size={20}/>
+              <TextRegular textStyle={styles.text}>
+              Demote
+            </TextRegular></>}
+            
+          </View>
+        </Pressable>}
+         
           <Pressable
             onPress={() => navigation.navigate('EditProductScreen', { id: item.id })
             }
@@ -106,6 +131,7 @@ export default function RestaurantDetailScreen ({ navigation, route }) {
       </ImageCard>
     )
   }
+
 
   const renderEmptyProductsList = () => {
     return (
@@ -151,6 +177,33 @@ export default function RestaurantDetailScreen ({ navigation, route }) {
       })
     }
   }
+
+  const promoteProduct = async(product) => {
+    try{
+      await promote(product.id)
+      await fetchRestaurantDetail()
+      showMessage({
+        message: `Product ${product.name} succesfully promoted`,
+        type: 'success',
+        style: GlobalStyles.flashStyle,
+        titleStyle: GlobalStyles.flashTextStyle
+      })
+    }catch (error) {
+      console.log(error)
+      setProductToBeDeleted(null)
+      showMessage({
+        message: `Product ${product.name} could not be promoted.`,
+        type: 'error',
+        style: GlobalStyles.flashStyle,
+        titleStyle: GlobalStyles.flashTextStyle
+      })
+    }
+  }
+
+
+
+
+
 
   return (
     <View style={styles.container}>

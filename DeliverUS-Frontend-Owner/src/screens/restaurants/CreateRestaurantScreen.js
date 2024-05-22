@@ -53,7 +53,10 @@ export default function CreateRestaurantScreen ({ navigation }) {
       .number()
       .positive()
       .integer()
-      .required('Restaurant category is required')
+      .required('Restaurant category is required'),
+      itemInput: yup
+      .number()
+      .max(99, 'No regales el producto')
   })
 
   useEffect(() => {
@@ -161,6 +164,10 @@ export default function CreateRestaurantScreen ({ navigation }) {
                 name='phone'
                 label='Phone:'
               />
+              <InputItem
+                name='itemInput'
+                label = 'descuento'
+                />
 
               <DropDownPicker
                 open={open}
